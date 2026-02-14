@@ -1,0 +1,25 @@
+# Raw data (too large for git — collected locally)
+raw/vehicle_positions/
+raw/trip_updates/
+raw/alerts/
+
+# DuckDB database
+*.duckdb
+*.duckdb.wal
+
+# Static GTFS (large, downloaded separately)
+static/*.txt
+static/*.zip
+static/archive/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+
+# Logs
+logs/
+
+# uv
+uv.lock

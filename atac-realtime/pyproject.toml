@@ -1,0 +1,13 @@
+[project]
+name = "atac-realtime"
+version = "0.1.0"
+description = "Real-time ingestion pipeline for Rome's ATAC GTFS-RT transit feeds"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "gtfs-realtime-bindings",
+    "requests",
+    "pandas",
+    "pyarrow",
+    "duckdb",
+]
