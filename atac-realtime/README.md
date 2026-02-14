@@ -365,14 +365,24 @@ NEW_MD5=$(curl -s https://romamobilita.it/sites/default/files/rome_static_gtfs.z
 OLD_MD5=$(md5sum rome_static_gtfs.zip 2>/dev/null | cut -d' ' -f1)
 
 if [ "$NEW_MD5" != "$OLD_MD5" ]; then
+    TODAY=$(date +%Y-%m-%d)
     echo "$(date): Static GTFS changed, downloading..."
+
+    # Archive the current version before overwriting
+    if [ -d gtfs ]; then
+        mv gtfs "gtfs_${TODAY}"
+        cp rome_static_gtfs.zip "rome_static_gtfs_${TODAY}.zip"
+    fi
+
     curl -O https://romamobilita.it/sites/default/files/rome_static_gtfs.zip
-    rm -rf gtfs && unzip -o rome_static_gtfs.zip -d gtfs
-    echo "$(date): Done."
+    unzip -o rome_static_gtfs.zip -d gtfs
+    echo "$(date): Done. Previous version archived as gtfs_${TODAY}/"
 else
     echo "$(date): Static GTFS unchanged."
 fi
 ```
+
+This keeps a dated copy of each version so you can track schedule changes over time. The `gtfs/` directory always points to the latest.
 
 ```bash
 chmod +x scripts/refresh_static.sh
