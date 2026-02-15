@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: main
+    tables:
+      - name: land_consumption
+        description: "Land consumption per comune (2006-2024), wide format"
+      - name: waste
+        description: "Municipal waste per comune per year (2010-2024), Italian number formatting"
+      - name: air_no2
+        description: "NO2 station-level annual statistics (2001-2022)"
+      - name: air_pm10
+        description: "PM10 station-level annual statistics (2002-2022)"
+      - name: air_pm25
+        description: "PM2.5 station-level annual statistics (2004-2022)"
+      - name: air_o3
+        description: "O3 station-level annual statistics (2002-2022)"

@@ -1,0 +1,20 @@
+name: ispra
+version: '0.1.0'
+
+profile: ispra_dev
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+
+clean-targets:
+  - target
+  - dbt_packages
+
+models:
+  ispra:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table

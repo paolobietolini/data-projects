@@ -1,0 +1,8 @@
+*.duckdb
+*.duckdb.wal
+.venv/
+raw/
+uv.lock
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
