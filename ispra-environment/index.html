@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pagella Ambientale — Le Regioni Italiane</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --terracotta: #C45A3C;
+  --terracotta-light: #E07A5F;
+  --ochre: #D4A84B;
+  --olive: #6B7F5E;
+  --travertine: #F5E6CC;
+  --night: #1A1714;
+  --night-mid: #2A2520;
+  --night-light: #3D362F;
+  --text-primary: #F0E6D6;
+  --text-secondary: #B8A99A;
+  --text-dim: #7A6E63;
+  --grade-a: #6BCB77;
+  --grade-b: #A8D672;
+  --grade-c: #D4A84B;
+  --grade-d: #E07A5F;
+  --grade-f: #C45A3C;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--night);
+  color: var(--text-primary);
+  font-family: 'Source Sans 3', sans-serif;
+  font-weight: 300;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ── HERO ── */
+.hero {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: 10;
+  background: linear-gradient(180deg, var(--night) 0%, rgba(26,23,20,0.85) 70%, rgba(26,23,20,0.95) 100%);
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 60%, rgba(107,203,119,0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 80% 50% at 30% 40%, rgba(212,168,75,0.04) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.hero-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--grade-a);
+  margin-bottom: 2rem;
+  opacity: 0;
+  animation: fadeUp 1s 0.3s forwards;
+}
+
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: clamp(2.8rem, 7vw, 6rem);
+  line-height: 1.05;
+  color: var(--travertine);
+  margin-bottom: 0.3em;
+  opacity: 0;
+  animation: fadeUp 1s 0.5s forwards;
+}
+
+.hero h1 em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--grade-a);
+}
+
+.hero-sub {
+  font-size: 1.15rem;
+  color: var(--text-secondary);
+  max-width: 520px;
+  margin: 0 auto 3rem;
+  opacity: 0;
+  animation: fadeUp 1s 0.7s forwards;
+}
+
+.hero-metrics {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  opacity: 0;
+  animation: fadeUp 1s 0.9s forwards;
+}
+
+.hero-metrics span { color: var(--ochre); font-weight: 600; }
+.hero-metrics .sep { width: 30px; height: 1px; background: rgba(196,90,60,0.3); }
+
+.scroll-hint {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0;
+  animation: fadeUp 1s 1.2s forwards;
+}
+
+.scroll-hint span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.scroll-arrow {
+  width: 1px;
+  height: 30px;
+  background: var(--grade-a);
+  animation: pulse 2s infinite;
+  position: relative;
+}
+.scroll-arrow::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -3px;
+  width: 7px;
+  height: 7px;
+  border-right: 1px solid var(--grade-a);
+  border-bottom: 1px solid var(--grade-a);
+  transform: rotate(45deg);
+}
+
+/* ── MAIN LAYOUT ── */
+.scrolly-container {
+  position: relative;
+  display: flex;
+}
+
+.viz-container {
+  position: sticky;
+  top: 0;
+  width: 60%;
+  height: 100vh;
+  z-index: 1;
+  background: var(--night);
+  overflow: hidden;
+}
+
+.viz-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(180deg, transparent, rgba(196,90,60,0.15), transparent);
+  z-index: 5;
+}
+
+/* Progress dots */
+.viz-progress {
+  position: absolute;
+  top: 1.2rem;
+  left: 2rem;
+  z-index: 10;
+  display: flex;
+  gap: 1.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.vp-dot {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--text-dim);
+  transition: color 0.4s;
+}
+
+.vp-dot.active { color: var(--ochre); }
+.vp-dot.explored { color: var(--text-secondary); }
+
+.vp-pip {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  transition: background 0.4s, box-shadow 0.4s;
+}
+
+.vp-dot.active .vp-pip { background: var(--ochre); box-shadow: 0 0 6px rgba(212,168,75,0.4); }
+.vp-dot.explored .vp-pip { background: var(--text-secondary); }
+
+/* Background metric title */
+.viz-overlay-metric {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(3rem, 6vw, 5.5rem);
+  font-weight: 900;
+  color: var(--travertine);
+  opacity: 0.04;
+  pointer-events: none;
+  transition: opacity 0.5s;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+#barChart {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  transition: opacity 0.4s;
+}
+
+/* Report card grid */
+.report-card {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2.5rem 2.5rem 2rem;
+  opacity: 0;
+  transition: opacity 0.5s;
+  pointer-events: none;
+  background: var(--night);
+}
+
+.report-card.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.rc-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ochre);
+  margin-bottom: 1rem;
+}
+
+.rc-header, .rc-row {
+  display: flex;
+  align-items: center;
+  padding: 0.35rem 0;
+}
+
+.rc-header {
+  border-bottom: 1px solid rgba(196,90,60,0.2);
+  margin-bottom: 0.3rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.rc-row {
+  border-bottom: 1px solid rgba(196,90,60,0.06);
+  transition: background 0.2s;
+}
+
+.rc-row:hover { background: rgba(196,90,60,0.05); }
+
+.rc-rank { width: 28px; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-dim); }
+.rc-name { flex: 1; font-size: 0.82rem; color: var(--text-secondary); }
+.rc-row:nth-child(-n+5) .rc-name { color: var(--text-primary); }
+
+.rc-grade {
+  width: 32px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: 3px;
+  margin-left: 5px;
+  color: var(--night);
+}
+
+.rc-overall {
+  width: 38px;
+  height: 26px;
+  font-size: 0.8rem;
+  margin-left: 10px;
+}
+
+/* ── NARRATIVE PANELS ── */
+.narrative {
+  width: 40%;
+  position: relative;
+  z-index: 2;
+  padding: 0;
+}
+
+.narrative-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 4rem 3rem 4rem 2rem;
+  opacity: 0.15;
+  transition: opacity 0.6s ease;
+}
+
+.narrative-section.active { opacity: 1; }
+
+.narrative-card {
+  background: linear-gradient(135deg, rgba(42,37,32,0.95), rgba(26,23,20,0.98));
+  border: 1px solid rgba(196,90,60,0.15);
+  border-radius: 2px;
+  padding: 2.5rem;
+  max-width: 440px;
+  position: relative;
+  backdrop-filter: blur(10px);
+}
+
+.narrative-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  border-radius: 2px 0 0 2px;
+}
+
+.narrative-card.accent-green::before { background: linear-gradient(180deg, var(--grade-a), var(--olive)); }
+.narrative-card.accent-ochre::before { background: linear-gradient(180deg, var(--ochre), var(--terracotta-light)); }
+.narrative-card.accent-red::before { background: linear-gradient(180deg, var(--terracotta-light), var(--terracotta)); }
+.narrative-card.accent-mixed::before { background: linear-gradient(180deg, var(--grade-a), var(--ochre), var(--terracotta)); }
+
+.card-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--grade-a);
+  margin-bottom: 0.5rem;
+}
+
+.card-label.ochre { color: var(--ochre); }
+.card-label.red { color: var(--terracotta-light); }
+
+.card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--travertine);
+  line-height: 1.2;
+  margin-bottom: 0.4rem;
+}
+
+.card-subtitle {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--ochre);
+  margin-bottom: 1.2rem;
+  line-height: 1.3;
+}
+
+.card-text {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 0.8rem;
+}
+
+.card-text strong { color: var(--text-primary); font-weight: 600; }
+
+.card-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(196,90,60,0.15);
+}
+
+.card-stat .num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--ochre);
+}
+
+.card-stat .unit {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.card-factoid {
+  margin-top: 0.8rem;
+  padding: 0.8rem 1rem;
+  background: rgba(107,127,94,0.1);
+  border-left: 2px solid var(--olive);
+  border-radius: 0 2px 2px 0;
+  font-size: 0.78rem;
+  color: var(--olive);
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1.5;
+}
+
+/* ── FOOTER ── */
+.footer {
+  position: relative;
+  z-index: 10;
+  padding: 4rem 3rem;
+  text-align: center;
+  border-top: 1px solid rgba(196,90,60,0.1);
+}
+
+.footer p {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  line-height: 2;
+}
+
+.footer a { color: var(--terracotta-light); text-decoration: none; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .scrolly-container { flex-direction: column; }
+  .viz-container { width: 100%; height: 55vh; }
+  .narrative { width: 100%; }
+  .narrative-section { min-height: 60vh; padding: 2rem 1.5rem; }
+  .narrative-card { max-width: 100%; padding: 1.8rem; }
+  .viz-overlay-metric { font-size: 2.5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-label">ISPRA Environmental Data · 2022–2024</div>
+  <h1>Pagella <em>Ambientale</em></h1>
+  <p class="hero-sub">Italy's 20 regions graded on waste recycling, land consumption, and air quality. Three metrics, one report card.</p>
+  <div class="hero-metrics">
+    <span>Rifiuti</span>
+    <div class="sep"></div>
+    <span>Suolo</span>
+    <div class="sep"></div>
+    <span>Aria</span>
+  </div>
+  <div class="scroll-hint">
+    <span>Scroll to explore</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</div>
+
+<!-- SCROLLYTELLING -->
+<div class="scrolly-container">
+
+  <!-- STICKY VIZ PANEL -->
+  <div class="viz-container">
+    <div class="viz-progress" id="vizProgress">
+      <span class="vp-dot active" data-metric="waste"><span class="vp-pip"></span>Rifiuti</span>
+      <span class="vp-dot" data-metric="land"><span class="vp-pip"></span>Suolo</span>
+      <span class="vp-dot" data-metric="air"><span class="vp-pip"></span>Aria</span>
+    </div>
+    <div class="viz-overlay-metric" id="vizOverlayMetric">Rifiuti</div>
+    <canvas id="barChart"></canvas>
+    <div id="reportCard" class="report-card"></div>
+  </div>
+
+  <!-- NARRATIVE -->
+  <div class="narrative">
+
+    <section class="narrative-section" data-metric="waste">
+      <div class="narrative-card accent-green">
+        <div class="card-label">Rifiuti</div>
+        <div class="card-title">Raccolta Differenziata</div>
+        <div class="card-subtitle">Where Italy recycles — and where it doesn't</div>
+        <div class="card-text">
+          Italy set a national target of <strong>65% sorted waste collection</strong>. Fourteen of twenty regions meet or exceed it. But the gap between top and bottom — <strong>23 percentage points</strong> — reveals a country still divided on waste management.
+        </div>
+        <div class="card-text">
+          <strong>Emilia-Romagna</strong> (78.9%) and <strong>Veneto</strong> (78.2%) lead through decades of investment in door-to-door collection. <strong>Sardegna</strong> (76.6%) proves southern regions can excel — its transformation from under 10% to 76% in fifteen years is Italy's biggest recycling success story.
+        </div>
+        <div class="card-stat">
+          <span class="num">78.9% → 55.5%</span>
+          <span class="unit">range across regions</span>
+        </div>
+        <div class="card-factoid">Emilia-Romagna recycles the most but also generates the most waste: 663 kg per capita, 40% above the national average.</div>
+      </div>
+    </section>
+
+    <section class="narrative-section" data-metric="waste">
+      <div class="narrative-card accent-green">
+        <div class="card-label">Rifiuti · Bottom Half</div>
+        <div class="card-title">The Laggards</div>
+        <div class="card-text">
+          At the bottom, <strong>Sicilia</strong> (55.5%) and <strong>Lazio</strong> (56.2%) struggle with aging infrastructure and inconsistent enforcement. Rome alone accounts for much of Lazio's poor performance — the capital's chronic waste management crisis drags the entire region down.
+        </div>
+        <div class="card-text">
+          The <strong>North-South divide</strong> is real but not absolute. Liguria (59.6%), despite being northern, ranks 16th. And six southern regions miss the 65% national target entirely.
+        </div>
+        <div class="card-factoid">Basilicata generates the least waste per capita (356 kg) but only recycles 66.3% — proving that less waste doesn't automatically mean better management.</div>
+      </div>
+    </section>
+
+    <section class="narrative-section" data-metric="land">
+      <div class="narrative-card accent-ochre">
+        <div class="card-label ochre">Suolo</div>
+        <div class="card-title">Consumo di Suolo</div>
+        <div class="card-subtitle">The irreversible cost of sprawl</div>
+        <div class="card-text">
+          Land consumption — the conversion of natural or agricultural soil to artificial surfaces — is Italy's quiet environmental crisis. <strong>Once paved, soil takes centuries to recover.</strong> ISPRA monitors every square meter.
+        </div>
+        <div class="card-text">
+          <strong>Lombardia</strong> leads at 16.55% consumed, driven by decades of industrial and residential expansion in the Po Valley. <strong>Campania</strong> (15.79%) follows — Naples and its sprawling hinterland eat into some of Italy's most fertile volcanic soil.
+        </div>
+        <div class="card-stat">
+          <span class="num">16.55% → 3.18%</span>
+          <span class="unit">highest to lowest</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="narrative-section" data-metric="land">
+      <div class="narrative-card accent-ochre">
+        <div class="card-label ochre">Suolo · Growth Since 2006</div>
+        <div class="card-title">Still Growing</div>
+        <div class="card-text">
+          Since 2006, Italy has consumed over <strong>135,000 hectares</strong> of new land — roughly the area of Rome's entire municipality. The Po Valley corridor (<strong>Lombardia, Veneto, Emilia-Romagna</strong>) accounts for a third of total national growth.
+        </div>
+        <div class="card-text">
+          <strong>Basilicata</strong> (3.18%) and <strong>Molise</strong> (3.75%) preserve the most, but more from economic stagnation than environmental policy. <strong>Sardegna</strong> (3.81%) shows it's possible for a developing region to stay green.
+        </div>
+        <div class="card-factoid">Puglia added nearly 15,000 ha since 2006 — more than Veneto — driven by industrial agriculture and coastal development along the Adriatic.</div>
+      </div>
+    </section>
+
+    <section class="narrative-section" data-metric="air">
+      <div class="narrative-card accent-red">
+        <div class="card-label red">Aria</div>
+        <div class="card-title">Qualità dell'Aria</div>
+        <div class="card-subtitle">NO&#8322; and PM10 across the peninsula</div>
+        <div class="card-text">
+          Air quality in Italy follows geography as much as policy. The <strong>Po Valley</strong> — enclosed by the Alps and Apennines — traps pollutants in a natural basin. Southern regions and islands, blessed with wind and lower density, breathe easier.
+        </div>
+        <div class="card-text">
+          <strong>Lombardia</strong>'s combined NO&#8322; (25.4 &mu;g/m³) and PM10 (29.7 &mu;g/m³) are nearly double <strong>Basilicata</strong>'s (7.3 and 17.8). Winter thermal inversions lock fine particulate over Po Valley cities for weeks at a time.
+        </div>
+        <div class="card-stat">
+          <span class="num">12.6 → 27.6</span>
+          <span class="unit">combined pollution index</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="narrative-section" data-metric="air">
+      <div class="narrative-card accent-red">
+        <div class="card-label red">Aria · The Po Valley Trap</div>
+        <div class="card-title">Geography as Destiny</div>
+        <div class="card-text">
+          <strong>Veneto</strong> follows close behind Lombardia with PM10 at 28.6 &mu;g/m³. <strong>Piemonte</strong> and <strong>Emilia-Romagna</strong> complete the Po Valley quartet of heavily polluted regions.
+        </div>
+        <div class="card-text">
+          Surprises exist: <strong>Trentino-Alto Adige</strong> (NO&#8322;: 22.5) suffers from transit traffic through the Brenner corridor despite its Alpine image. And <strong>Molise</strong> ranks 17th — its few monitoring stations may overweight urban readings.
+        </div>
+        <div class="card-factoid">Basilicata's NO&#8322; average (7.3 &mu;g/m³) is less than a third of Lombardia's — the clearest air in mainland Italy.</div>
+      </div>
+    </section>
+
+    <section class="narrative-section" data-metric="overall">
+      <div class="narrative-card accent-mixed">
+        <div class="card-label">Pagella Finale</div>
+        <div class="card-title">La Classifica</div>
+        <div class="card-subtitle">Three metrics, one environmental grade</div>
+        <div class="card-text">
+          Each region ranked 1–20 per metric. Grades: <strong>A</strong> (top 4), <strong>B</strong> (5–8), <strong>C</strong> (9–12), <strong>D</strong> (13–16), <strong>F</strong> (17–20). Overall grade from average rank across all three.
+        </div>
+        <div class="card-text">
+          <strong>Sardegna</strong> tops the chart — consistent top grades across all metrics. <strong>Basilicata</strong> and <strong>Valle d'Aosta</strong> follow. At the bottom, <strong>Campania</strong> earns an F everywhere, and <strong>Lombardia</strong>'s economic powerhouse comes at a steep environmental cost.
+        </div>
+        <div class="card-factoid">The top 4 overall regions (Sardegna, Basilicata, Valle d'Aosta, Umbria) are all among Italy's least populous — a pattern, not a coincidence.</div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <p>
+    Data: ISPRA Rapporto Rifiuti Urbani 2024 · ISPRA Consumo di Suolo 2024 · ISPRA Qualità dell'Aria 2022<br>
+    Visualization by <a href="https://paolobietolini.com">Paolo Bietolini</a> · No external libraries
+  </p>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ── DATA ──
+  // Waste: sorted by recycling_rate DESC (best first)
+  const WASTE = [
+    ['Emilia-Romagna',78.9],['Veneto',78.2],['Sardegna',76.6],['Trentino-Alto Adige',75.8],
+    ['Lombardia',74.3],['Friuli-Venezia Giulia',72.7],['Marche',71.8],["Valle d'Aosta",71.7],
+    ['Umbria',69.6],['Piemonte',68.9],['Toscana',68.1],['Basilicata',66.3],
+    ['Abruzzo',65.7],['Molise',61.7],['Puglia',60.7],['Liguria',59.6],
+    ['Campania',58.1],['Calabria',57.5],['Lazio',56.2],['Sicilia',55.5],
+  ];
+
+  // Land: sorted by consumed_pct ASC (best = least consumed first)
+  const LAND = [
+    ['Basilicata',3.18],['Molise',3.75],['Sardegna',3.81],["Valle d'Aosta",3.83],
+    ['Trentino-Alto Adige',4.14],['Umbria',5.20],['Abruzzo',5.70],['Calabria',5.80],
+    ['Lazio',6.86],['Piemonte',7.52],['Toscana',8.10],['Marche',8.13],
+    ['Liguria',8.37],['Sicilia',9.35],['Emilia-Romagna',10.29],['Friuli-Venezia Giulia',10.52],
+    ['Puglia',11.43],['Veneto',13.96],['Campania',15.79],['Lombardia',16.55],
+  ];
+
+  // Air: combined (NO2+PM10)/2, sorted ASC (best = cleanest first)
+  const AIR = [
+    ['Basilicata',12.6],['Calabria',14.1],['Sardegna',15.6],['Umbria',17.5],
+    ["Valle d'Aosta",17.9],['Abruzzo',18.4],['Puglia',18.5],['Sicilia',19.0],
+    ['Liguria',19.1],['Friuli-Venezia Giulia',19.2],['Marche',19.7],['Toscana',19.8],
+    ['Trentino-Alto Adige',20.6],['Lazio',21.5],['Emilia-Romagna',21.7],['Piemonte',22.9],
+    ['Molise',23.2],['Veneto',24.6],['Campania',25.6],['Lombardia',27.6],
+  ];
+
+  // ── GRADING ──
+  function gradeFromRank(r) {
+    if (r <= 4) return 'A';
+    if (r <= 8) return 'B';
+    if (r <= 12) return 'C';
+    if (r <= 16) return 'D';
+    return 'F';
+  }
+
+  const GRADE_COLORS = {
+    A: [107,203,119], B: [168,214,114], C: [212,168,75], D: [224,122,95], F: [196,90,60]
+  };
+
+  function gradeRGBA(grade, alpha) {
+    return 'rgba(' + GRADE_COLORS[grade].join(',') + ',' + alpha + ')';
+  }
+
+  function gradeHex(grade) {
+    const c = GRADE_COLORS[grade];
+    return '#' + c.map(v => v.toString(16).padStart(2,'0')).join('');
+  }
+
+  // Build region lookup with ranks for all 3 metrics
+  const regionData = {};
+
+  function addRanks(data, key) {
+    data.forEach(function(item, i) {
+      const name = item[0];
+      if (!regionData[name]) regionData[name] = { name: name };
+      regionData[name][key + 'Rank'] = i + 1;
+      regionData[name][key + 'Grade'] = gradeFromRank(i + 1);
+      regionData[name][key + 'Value'] = item[1];
+    });
+  }
+
+  addRanks(WASTE, 'waste');
+  addRanks(LAND, 'land');
+  addRanks(AIR, 'air');
+
+  // Compute overall
+  var regionList = Object.values(regionData);
+  regionList.forEach(function(r) {
+    r.avgRank = (r.wasteRank + r.landRank + r.airRank) / 3;
+  });
+  regionList.sort(function(a, b) { return a.avgRank - b.avgRank; });
+  regionList.forEach(function(r, i) {
+    r.overallRank = i + 1;
+    r.overallGrade = gradeFromRank(i + 1);
+  });
+
+  // ── METRIC CONFIGS ──
+  const METRICS = {
+    waste: {
+      title: '% RACCOLTA DIFFERENZIATA',
+      subtitle: 'Sorted waste collection rate · ISPRA 2024',
+      unit: '%',
+      data: WASTE,
+      maxScale: 85,
+      overlay: 'Rifiuti'
+    },
+    land: {
+      title: '% SUOLO CONSUMATO',
+      subtitle: 'Share of artificial land cover · ISPRA 2024',
+      unit: '%',
+      data: LAND,
+      maxScale: 18,
+      overlay: 'Suolo'
+    },
+    air: {
+      title: 'INDICE INQUINAMENTO',
+      subtitle: 'Average of NO₂ and PM10 means · ISPRA 2022',
+      unit: '',
+      data: AIR,
+      maxScale: 30,
+      overlay: 'Aria'
+    }
+  };
+
+  // ── CANVAS SETUP ──
+  const canvas = document.getElementById('barChart');
+  const ctx = canvas.getContext('2d');
+  var canvasW, canvasH;
+
+  function resizeCanvas() {
+    var container = document.querySelector('.viz-container');
+    var dpr = window.devicePixelRatio || 1;
+    canvasW = container.offsetWidth;
+    canvasH = container.offsetHeight;
+    canvas.width = canvasW * dpr;
+    canvas.height = canvasH * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  // ── BAR CHART DRAWING ──
+  function drawBars(metricKey, progress) {
+    var m = METRICS[metricKey];
+    var data = m.data;
+    ctx.clearRect(0, 0, canvasW, canvasH);
+
+    var pad = { top: 70, bottom: 30, left: 175, right: 75 };
+    var chartW = canvasW - pad.left - pad.right;
+    var chartH = canvasH - pad.top - pad.bottom;
+    var rowH = chartH / data.length;
+    var barH = Math.min(rowH * 0.68, 28);
+
+    // Chart title
+    ctx.font = '600 11px "JetBrains Mono", monospace';
+    ctx.fillStyle = 'rgba(240,230,214,0.5)';
+    ctx.textAlign = 'left';
+    ctx.fillText(m.title, pad.left, 35);
+
+    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.fillStyle = 'rgba(184,169,154,0.4)';
+    ctx.fillText(m.subtitle, pad.left, 52);
+
+    // Vertical grid lines
+    for (var g = 0; g <= 4; g++) {
+      var gx = pad.left + (chartW / 4) * g;
+      ctx.strokeStyle = 'rgba(122,110,99,0.08)';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(gx, pad.top);
+      ctx.lineTo(gx, pad.top + chartH);
+      ctx.stroke();
+    }
+
+    // Bars
+    data.forEach(function(item, i) {
+      var name = item[0];
+      var value = item[1];
+      var rank = i + 1;
+      var grade = gradeFromRank(rank);
+      var y = pad.top + i * rowH + (rowH - barH) / 2;
+      var barW = Math.max((value / m.maxScale) * chartW * progress, 0);
+
+      // Rank number
+      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.fillStyle = 'rgba(122,110,99,0.4)';
+      ctx.textAlign = 'right';
+      ctx.fillText(rank + '.', 22, y + barH / 2 + 4);
+
+      // Region label
+      ctx.font = (rank <= 4 ? '600 ' : '') + '11px "JetBrains Mono", monospace';
+      ctx.fillStyle = rank <= 4 ? 'rgba(240,230,214,0.9)' : 'rgba(184,169,154,0.65)';
+      ctx.textAlign = 'right';
+      ctx.fillText(name, pad.left - 10, y + barH / 2 + 4);
+
+      // Bar background
+      ctx.fillStyle = 'rgba(122,110,99,0.06)';
+      ctx.beginPath();
+      ctx.roundRect(pad.left, y, chartW, barH, 2);
+      ctx.fill();
+
+      // Bar fill
+      if (barW > 2) {
+        ctx.fillStyle = gradeRGBA(grade, 0.7);
+        ctx.beginPath();
+        ctx.roundRect(pad.left, y, barW, barH, 2);
+        ctx.fill();
+      }
+
+      // Value label
+      if (progress > 0.5) {
+        var valAlpha = Math.min((progress - 0.5) * 2, 1);
+        ctx.font = '10px "JetBrains Mono", monospace';
+        ctx.fillStyle = gradeRGBA(grade, valAlpha * 0.9);
+        ctx.textAlign = 'left';
+        ctx.fillText(value.toFixed(1) + m.unit, pad.left + barW + 8, y + barH / 2 + 4);
+      }
+
+      // Grade badge
+      if (progress > 0.7) {
+        var badgeAlpha = Math.min((progress - 0.7) * 3.33, 1);
+        ctx.font = '600 12px "JetBrains Mono", monospace';
+        ctx.fillStyle = gradeRGBA(grade, badgeAlpha);
+        ctx.textAlign = 'center';
+        ctx.fillText(grade, canvasW - 35, y + barH / 2 + 4);
+      }
+    });
+
+    // National target line for waste
+    if (metricKey === 'waste') {
+      var targetX = pad.left + (65 / m.maxScale) * chartW * progress;
+      if (progress > 0.3) {
+        ctx.strokeStyle = 'rgba(240,230,214,0.15)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(targetX, pad.top - 5);
+        ctx.lineTo(targetX, pad.top + chartH + 5);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.font = '9px "JetBrains Mono", monospace';
+        ctx.fillStyle = 'rgba(240,230,214,0.25)';
+        ctx.textAlign = 'center';
+        ctx.fillText('65% target', targetX, pad.top - 10);
+      }
+    }
+  }
+
+  // ── REPORT CARD ──
+  function buildReportCard() {
+    var el = document.getElementById('reportCard');
+    var sorted = regionList.slice().sort(function(a, b) { return a.overallRank - b.overallRank; });
+
+    var html = '<div class="rc-title">Pagella Ambientale · Classifica Generale</div>';
+    html += '<div class="rc-header">';
+    html += '<span class="rc-rank">#</span>';
+    html += '<span class="rc-name">Regione</span>';
+    html += '<span class="rc-grade">Rif.</span>';
+    html += '<span class="rc-grade">Suo.</span>';
+    html += '<span class="rc-grade">Aria</span>';
+    html += '<span class="rc-grade rc-overall">Voto</span>';
+    html += '</div>';
+
+    sorted.forEach(function(r) {
+      html += '<div class="rc-row">';
+      html += '<span class="rc-rank">' + r.overallRank + '</span>';
+      html += '<span class="rc-name">' + r.name + '</span>';
+      html += '<span class="rc-grade" style="background:' + gradeHex(r.wasteGrade) + '">' + r.wasteGrade + '</span>';
+      html += '<span class="rc-grade" style="background:' + gradeHex(r.landGrade) + '">' + r.landGrade + '</span>';
+      html += '<span class="rc-grade" style="background:' + gradeHex(r.airGrade) + '">' + r.airGrade + '</span>';
+      html += '<span class="rc-grade rc-overall" style="background:' + gradeHex(r.overallGrade) + '">' + r.overallGrade + '</span>';
+      html += '</div>';
+    });
+
+    el.innerHTML = html;
+  }
+
+  // ── ANIMATION ──
+  var currentMetricKey = null;
+  var animStart = 0;
+  var animDuration = 700;
+  var animRunning = false;
+
+  function animateBars(metricKey) {
+    if (metricKey === currentMetricKey) return;
+    currentMetricKey = metricKey;
+    animStart = performance.now();
+    if (!animRunning) {
+      animRunning = true;
+      requestAnimationFrame(animFrame);
+    }
+  }
+
+  function animFrame(now) {
+    var elapsed = now - animStart;
+    var t = Math.min(elapsed / animDuration, 1);
+    var eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
+    drawBars(currentMetricKey, eased);
+    if (t < 1) {
+      requestAnimationFrame(animFrame);
+    } else {
+      animRunning = false;
+    }
+  }
+
+  // ── VIZ STATE MANAGEMENT ──
+  var explored = {};
+  var overlayMetricEl = document.getElementById('vizOverlayMetric');
+  var reportCardEl = document.getElementById('reportCard');
+
+  function getMetricKey(sectionMetric) {
+    if (sectionMetric === 'overall') return 'overall';
+    return sectionMetric;
+  }
+
+  function updateViz(metricKey) {
+    // Progress dots
+    var dots = document.querySelectorAll('.vp-dot');
+    dots.forEach(function(dot) {
+      var dm = dot.dataset.metric;
+      dot.classList.remove('active', 'explored');
+      if (metricKey === 'overall') {
+        dot.classList.add('explored');
+      } else if (dm === metricKey) {
+        dot.classList.add('active');
+      } else if (explored[dm]) {
+        dot.classList.add('explored');
+      }
+    });
+
+    // Track explored
+    if (metricKey !== 'overall') explored[metricKey] = true;
+
+    // Overlay text
+    var titles = { waste: 'Rifiuti', land: 'Suolo', air: 'Aria', overall: 'Pagella' };
+    overlayMetricEl.textContent = titles[metricKey];
+
+    if (metricKey === 'overall') {
+      canvas.style.opacity = '0';
+      reportCardEl.classList.add('active');
+    } else {
+      canvas.style.opacity = '1';
+      reportCardEl.classList.remove('active');
+      animateBars(metricKey);
+    }
+  }
+
+  // ── SCROLL OBSERVER ──
+  var sections = document.querySelectorAll('.narrative-section');
+  var activeMetric = null;
+
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting && entry.intersectionRatio > 0.35) {
+        var section = entry.target;
+        var metric = section.dataset.metric;
+
+        // Activate card
+        sections.forEach(function(s) { s.classList.remove('active'); });
+        section.classList.add('active');
+
+        var metricKey = getMetricKey(metric);
+        if (metricKey !== activeMetric) {
+          activeMetric = metricKey;
+          updateViz(metricKey);
+        }
+      }
+    });
+  }, {
+    threshold: [0.35, 0.5],
+    rootMargin: '-10% 0px -10% 0px',
+  });
+
+  sections.forEach(function(s) { observer.observe(s); });
+
+  // ── INIT ──
+  resizeCanvas();
+  buildReportCard();
+  drawBars('waste', 1);
+  sections[0].classList.add('active');
+  explored.waste = true;
+
+  window.addEventListener('resize', function() {
+    resizeCanvas();
+    if (activeMetric && activeMetric !== 'overall') {
+      drawBars(activeMetric, 1);
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
